@@ -7,13 +7,15 @@ Description: Visually demonstrate bitwise shifting on the command line, on the f
 '''
 import curses, curses.ascii
 
-top = {"position":(6,0), "value":"0"}
-bottom = {"position":(10,0), "value":"0"}
-total = {"position":(0,0), "value":"0"}
+top = {"position":(6,18), "value":0}
+bottom = {"position":(10,18), "value":0}
+total = {"position":(0,0), "value":0}
 currField = top
 bitop = "&"
 
 def printVals(stdscr):
+	global currField, top, bottom, total
+	total["value"] = eval("{:} {:} {:}".format(top["value"], bitop, bottom["value"]))
 	stdscr.addstr("------------------\n")
 	stdscr.addstr("|{:^16}| {:}\n".format(top["value"], top["value"]))
 	stdscr.addstr("------------------\n")
@@ -21,7 +23,7 @@ def printVals(stdscr):
 	stdscr.addstr("------------------\n")
 	stdscr.addstr("|{:^16}| {:}\n".format(bottom["value"], bottom["value"]))
 	stdscr.addstr("------------------\n")
-	stdscr.addstr("\n\n")
+	stdscr.addstr("\n")
 	stdscr.addstr("------------------\n")
 	stdscr.addstr("|{:^16}| {:}\n".format(total["value"], total["value"]))
 	stdscr.addstr("------------------\n")
@@ -29,6 +31,7 @@ def printVals(stdscr):
 	stdscr.cursyncup()
 
 def switchField():
+	global currField, top, bottom
 	if currField == top:
 		currField = bottom
 	else:
@@ -36,7 +39,7 @@ def switchField():
 
 def doAction(key):
 	if key == curses.ascii.TAB: switchField()
-	elif curses.ascii.isdigit(key): currField["value"].append(key)
+	elif curses.ascii.isdigit(key): currField["value"] += int(curses.ascii.unctrl(key))
 	elif key == ord('q'): return True # Exit the while()
 	elif key == ord('Q'): return True # Exit the while()
 	return False
@@ -52,6 +55,9 @@ def main(stdscr):
 		c = stdscr.getch()
 		if doAction(c):
 			break
+		stdscr.move(5,0)
+		stdscr.clrtobot()
+		printVals(stdscr)
 		stdscr.refresh()
 
 
